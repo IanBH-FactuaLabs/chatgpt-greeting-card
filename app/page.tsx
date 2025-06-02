@@ -3,11 +3,12 @@ import { useState } from 'react';
 
 export default function Page() {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi! I’m your AI greeting card designer. What kind of card would you like to create today?' }
+    { role: 'assistant', content: 'Hi! I’m your AI greeting card designer. What kind of card would you like to create today?', action: null }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState<string | null>(null);
+  const [latestAction, setLatestAction] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
 
   const sendMessage = async () => {
     const newMessages = [...messages, { role: 'user', content: input }];
@@ -18,13 +19,25 @@ export default function Page() {
     const res = await fetch('/api/chat-designer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: newMessages }),
+      body: JSON.stringify({ messages: newMessages.map(({ role, content }) => ({ role, content })) }),
     });
 
     const data = await res.json();
-    setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
-    if (data.imageUrl) setImage(data.imageUrl);
+
+    setMessages([...newMessages, { role: 'assistant', content: data.reply, action: data.action || null }]);
+    setLatestAction(data.action || null);
+    setSummary(data.summary || null);
     setLoading(false);
+  };
+
+  const handleGenerateCard = async () => {
+    if (!summary) return;
+    await fetch('https://hooks.zapier.com/hooks/catch/18620594/2vsp223/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ summary }),
+    });
+    alert('Card generation requested!');
   };
 
   return (
@@ -38,10 +51,14 @@ export default function Page() {
           </div>
         ))}
         {loading && <div className="text-left text-gray-400">Typing...</div>}
-        {image && (
-          <div className="mt-4 text-center">
-            <h3 className="font-semibold mb-2">🎨 Generated Card</h3>
-            <img src={image} alt="Generated card" className="rounded-lg shadow max-w-full mx-auto" />
+        {latestAction === 'ready_to_generate' && summary && (
+          <div className="text-center mt-4">
+            <button
+              onClick={handleGenerateCard}
+              className="bg-purple-600 text-white px-6 py-3 rounded shadow"
+            >
+              🎨 Generate Card
+            </button>
           </div>
         )}
       </div>
