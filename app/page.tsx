@@ -33,43 +33,35 @@ export default function Page() {
     setLoading(false);
   };
 
-  const handleGenerateCard = async () => {
-    if (!summary) return;
+  const postToZapier = async (payload: Record<string, any>) => {
     const res = await fetch('/api/trigger-zap', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ summary }),
+      body: JSON.stringify(payload),
     });
+
     const result = await res.json();
     if (!res.ok) {
-      alert('Failed to trigger Zapier webhook.');
+      alert('Zapier webhook failed.');
       console.error(result);
     } else {
-      alert('Card generation request sent successfully!');
+      alert('Request sent to Zapier!');
     }
+  };
+
+  const handleGenerateCard = async () => {
+    if (!summary) return;
+    await postToZapier({ summary });
   };
 
   const handleReviseCard = async () => {
     if (!summary || !revisionText) return;
-    const res = await fetch('/api/trigger-zap', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ summary, revision: revisionText }),
-    });
-    const result = await res.json();
-    if (!res.ok) {
-      alert('Failed to send revision.');
-      console.error(result);
-    } else {
-      alert('Revision request sent!');
-      setRevisionMode(false);
-      setRevisionText('');
-      setImage(null);
-    }
+    await postToZapier({ summary, revision: revisionText });
+    setRevisionMode(false);
+    setRevisionText('');
+    setImage(null);
   };
 
   useEffect(() => {
