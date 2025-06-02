@@ -4,25 +4,31 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { summary } = req.body;
+  const { summary, revision, image } = req.body;
 
   try {
-    const zapierResponse = await fetch('https://hooks.zapier.com/hooks/catch/18620594/2vsp223/', {
+    const zapierRes = await fetch('https://hooks.zapier.com/hooks/catch/18620594/2vsp223/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ summary }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        summary,
+        revision: revision || undefined,
+        image: image || undefined,
+      }),
     });
 
-    const text = await zapierResponse.text();
+    const resultText = await zapierRes.text();
 
-    if (!zapierResponse.ok) {
-      console.error('Zapier webhook failed:', zapierResponse.status, text);
-      return res.status(500).json({ error: 'Zapier failed', text });
+    if (!zapierRes.ok) {
+      console.error('Zapier response failed:', resultText);
+      return res.status(500).json({ ok: false, error: resultText });
     }
 
-    return res.status(200).json({ ok: true, zapierResponse: text });
+    return res.status(200).json({ ok: true, result: resultText });
   } catch (err) {
-    console.error('Zapier server error:', err);
-    return res.status(500).json({ error: 'Unexpected server error', message: (err as Error).message });
+    console.error('Webhook error:', err);
+    return res.status(500).json({ ok: false, error: (err as Error).message });
   }
 }
