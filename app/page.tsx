@@ -32,7 +32,7 @@ export default function Page() {
 
   const handleGenerateCard = async () => {
     if (!summary) return;
-    await fetch('https://hooks.zapier.com/hooks/catch/your-zap-id-here', {
+    await fetch('https://hooks.zapier.com/hooks/catch/18620594/2vsp223/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
