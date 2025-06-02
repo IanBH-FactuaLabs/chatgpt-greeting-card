@@ -41,6 +41,7 @@ export default function Page() {
         summary,
       }),
     });
+  };
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-4">
