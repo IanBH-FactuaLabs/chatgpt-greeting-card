@@ -7,6 +7,7 @@ export default function Page() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
 
   const sendMessage = async () => {
     const newMessages = [...messages, { role: 'user', content: input }];
@@ -22,6 +23,7 @@ export default function Page() {
 
     const data = await res.json();
     setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
+    if (data.imageUrl) setImage(data.imageUrl);
     setLoading(false);
   };
 
@@ -36,6 +38,12 @@ export default function Page() {
           </div>
         ))}
         {loading && <div className="text-left text-gray-400">Typing...</div>}
+        {image && (
+          <div className="mt-4 text-center">
+            <h3 className="font-semibold mb-2">🎨 Generated Card</h3>
+            <img src={image} alt="Generated card" className="rounded-lg shadow max-w-full mx-auto" />
+          </div>
+        )}
       </div>
       <div className="flex gap-2">
         <input

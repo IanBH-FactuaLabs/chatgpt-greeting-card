@@ -5,25 +5,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { messages } = req.body;
 
-  const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+  const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4',
+      model: 'gpt-4-vision-preview',
       messages: [
         {
           role: 'system',
-          content: 'You are a friendly AI that helps users design greeting cards. Ask one question at a time to gather details like occasion, relationship, tone, imagery, color palette, front message, and inside message. Once you have enough information, offer to generate a visual preview.',
+          content: `You are a greeting card designer who creates both the greeting message and a card image. Once you've gathered all the necessary information, respond with a message and a visual card design in the form of a base64-encoded image embedded in a Markdown image tag.`,
         },
-        ...messages,
+        ...messages
       ],
-    }),
+      temperature: 0.8,
+      max_tokens: 1500,
+    })
   });
 
-  const data = await chatResponse.json();
+  const data = await openaiResponse.json();
+
   const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
-  res.status(200).json({ reply });
+
+  // Look for a base64-encoded image embedded in a markdown-style image tag
+  const imageMatch = reply.match(/!\[.*?\]\((data:image\/(png|jpeg);base64,[^)]+)\)/);
+
+  res.status(200).json({
+    reply,
+    imageUrl: imageMatch ? imageMatch[1] : null,
+  });
 }
