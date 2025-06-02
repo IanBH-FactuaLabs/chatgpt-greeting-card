@@ -32,13 +32,15 @@ export default function Page() {
 
   const handleGenerateCard = async () => {
     if (!summary) return;
-    await fetch('https://hooks.zapier.com/hooks/catch/18620594/2vsp223/', {
+    await fetch('https://hooks.zapier.com/hooks/catch/your-zap-id-here', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ summary }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        summary,
+      }),
     });
-    alert('Card generation requested!');
-  };
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-4">
