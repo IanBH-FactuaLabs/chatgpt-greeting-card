@@ -12,11 +12,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-vision-preview',
+      model: 'gpt-4-turbo', 
       messages: [
         {
           role: 'system',
-          content: `You are a greeting card designer who creates both the greeting message and a card image. Once you've gathered all the necessary information, respond with a message and a visual card design in the form of a base64-encoded image embedded in a Markdown image tag.`,
+          content: `You are a greeting card designer. Ask the user one question at a time to gather card details (occasion, tone, imagery, color palette, front and inside messages). Once ready, generate and return a base64 image inside a Markdown tag (e.g., ![card](data:image/png;base64,...)) and accompany it with a short message.`,
         },
         ...messages
       ],
