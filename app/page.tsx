@@ -57,12 +57,19 @@ export default function Page() {
   };
 
   const handleReviseCard = async () => {
-    if (!summary || !revisionText) return;
-    await postToZapier({ summary, revision: revisionText });
+    if (!summary || !revisionText || !image) return;
+  
+    await postToZapier({
+      summary,
+      revision: revisionText,
+      image,
+    });
+  
     setRevisionMode(false);
     setRevisionText('');
     setImage(null);
   };
+  
 
   useEffect(() => {
     const interval = setInterval(async () => {
