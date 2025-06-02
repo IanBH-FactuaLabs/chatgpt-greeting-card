@@ -75,7 +75,7 @@ export default function Page() {
     const interval = setInterval(async () => {
       const res = await fetch('/api/receive-image');
       const data = await res.json();
-      if (data.url && !image) {
+      if (data.url && data.url !== image) {
         setMessages((prev) => [
           ...prev,
           { role: 'assistant', content: 'Here’s your generated card!', action: null },

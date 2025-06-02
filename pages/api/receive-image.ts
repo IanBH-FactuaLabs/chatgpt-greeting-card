@@ -1,5 +1,4 @@
 // pages/api/receive-image.ts
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 let latestImage: { url: string; summary: string } | null = null;
@@ -12,7 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     latestImage = { url: imageUrl, summary };
-    console.log('✅ Image received:', latestImage);
+    console.log('✅ Received image:', imageUrl);
     return res.status(200).json({ success: true });
   }
 
