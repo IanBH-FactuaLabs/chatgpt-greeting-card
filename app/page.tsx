@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Page() {
   const [messages, setMessages] = useState([
@@ -9,6 +9,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [latestAction, setLatestAction] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
+  const [image, setImage] = useState<string | null>(null);
 
   const sendMessage = async () => {
     const newMessages = [...messages, { role: 'user', content: input, action: null }];
@@ -32,7 +33,6 @@ export default function Page() {
 
   const handleGenerateCard = async () => {
     if (!summary) return;
-  
     const res = await fetch('/api/trigger-zap', {
       method: 'POST',
       headers: {
@@ -40,7 +40,6 @@ export default function Page() {
       },
       body: JSON.stringify({ summary }),
     });
-  
     const result = await res.json();
     if (!res.ok) {
       alert('Failed to trigger Zapier webhook.');
@@ -49,6 +48,22 @@ export default function Page() {
       alert('Card generation request sent successfully!');
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const res = await fetch('/api/receive-image');
+      const data = await res.json();
+      if (data.url && !image) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: 'Here’s your generated card!', action: null },
+        ]);
+        setImage(data.url);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [image]);
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-4">
@@ -61,7 +76,12 @@ export default function Page() {
           </div>
         ))}
         {loading && <div className="text-left text-gray-400">Typing...</div>}
-        {latestAction === 'ready_to_generate' && summary && (
+        {image && (
+          <div className="text-center mt-4">
+            <img src={image} alt="Generated greeting card" className="max-w-full mx-auto rounded shadow" />
+          </div>
+        )}
+        {latestAction === 'ready_to_generate' && summary && !image && (
           <div className="text-center mt-4">
             <button
               onClick={handleGenerateCard}
