@@ -11,7 +11,7 @@ export default function Page() {
   const [summary, setSummary] = useState<string | null>(null);
 
   const sendMessage = async () => {
-    const newMessages = [...messages, { role: 'user', content: input }];
+    const newMessages = [...messages, { role: 'user', content: input, action: null }];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
