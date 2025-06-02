@@ -33,27 +33,20 @@ export default function Page() {
   const handleGenerateCard = async () => {
     if (!summary) return;
   
-    try {
-      const response = await fetch('https://hooks.zapier.com/hooks/catch/18620594/2vsp223/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ summary }),
-      });
+    const res = await fetch('/api/trigger-zap', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ summary }),
+    });
   
-      const result = await response.text();
-      console.log('Zapier response:', result);
-  
-      if (!response.ok) {
-        console.error('Zapier error:', response.status, result);
-        alert('Zapier webhook failed.');
-      } else {
-        alert('Card generation request sent to Zapier!');
-      }
-    } catch (err) {
-      console.error('Webhook error:', err);
-      alert('Webhook error — check console.');
+    const result = await res.json();
+    if (!res.ok) {
+      alert('Failed to trigger Zapier webhook.');
+      console.error(result);
+    } else {
+      alert('Card generation request sent successfully!');
     }
   };
 
