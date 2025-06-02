@@ -10,6 +10,8 @@ export default function Page() {
   const [latestAction, setLatestAction] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
+  const [revisionMode, setRevisionMode] = useState(false);
+  const [revisionText, setRevisionText] = useState('');
 
   const sendMessage = async () => {
     const newMessages = [...messages, { role: 'user', content: input, action: null }];
@@ -49,6 +51,27 @@ export default function Page() {
     }
   };
 
+  const handleReviseCard = async () => {
+    if (!summary || !revisionText) return;
+    const res = await fetch('/api/trigger-zap', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ summary, revision: revisionText }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      alert('Failed to send revision.');
+      console.error(result);
+    } else {
+      alert('Revision request sent!');
+      setRevisionMode(false);
+      setRevisionText('');
+      setImage(null);
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(async () => {
       const res = await fetch('/api/receive-image');
@@ -78,7 +101,31 @@ export default function Page() {
         {loading && <div className="text-left text-gray-400">Typing...</div>}
         {image && (
           <div className="text-center mt-4">
-            <img src={image} alt="Generated greeting card" className="max-w-full mx-auto rounded shadow" />
+            <img src={image} alt="Generated greeting card" className="max-w-full mx-auto rounded shadow mb-4" />
+            {!revisionMode && (
+              <button
+                onClick={() => setRevisionMode(true)}
+                className="bg-yellow-500 text-white px-4 py-2 rounded"
+              >
+                ✏️ Revise This Image
+              </button>
+            )}
+            {revisionMode && (
+              <div className="mt-4">
+                <textarea
+                  value={revisionText}
+                  onChange={(e) => setRevisionText(e.target.value)}
+                  placeholder="Describe what you'd like to change"
+                  className="w-full border p-2 mb-2 rounded"
+                />
+                <button
+                  onClick={handleReviseCard}
+                  className="bg-purple-600 text-white px-4 py-2 rounded"
+                >
+                  🔁 Submit Revision
+                </button>
+              </div>
+            )}
           </div>
         )}
         {latestAction === 'ready_to_generate' && summary && !image && (
