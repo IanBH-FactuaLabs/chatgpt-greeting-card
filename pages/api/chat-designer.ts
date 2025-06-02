@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
 
   const data = await openaiResponse.json();
-
+  console.log(JSON.stringify(data, null, 2));
   const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
 
   // Look for a base64-encoded image embedded in a markdown-style image tag
