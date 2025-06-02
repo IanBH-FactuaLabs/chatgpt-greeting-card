@@ -30,7 +30,7 @@ export default function Page() {
       <div className="border rounded p-4 h-[500px] overflow-y-scroll bg-gray-50 mb-4">
         {messages.map((m, i) => (
           <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={\`inline-block px-3 py-2 rounded-lg \${m.role === 'user' ? 'bg-blue-200' : 'bg-green-200'}\`}>
+            <span className={`inline-block px-3 py-2 rounded-lg ${m.role === 'user' ? 'bg-blue-200' : 'bg-green-200'}`}>
               {m.content}
             </span>
           </div>
