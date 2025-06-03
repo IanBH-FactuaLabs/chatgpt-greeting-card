@@ -12,6 +12,7 @@ export default function Page() {
   const [image, setImage] = useState<string | null>(null);
   const [revisionMode, setRevisionMode] = useState(false);
   const [revisionText, setRevisionText] = useState('');
+  const [imageRequested, setImageRequested] = useState(false);
 
   const sendMessage = async () => {
     const newMessages = [...messages, { role: 'user', content: input, action: null }];
@@ -54,25 +55,21 @@ export default function Page() {
   const handleGenerateCard = async () => {
     if (!summary) return;
     await postToZapier({ summary });
+    setImageRequested(true);
   };
 
   const handleReviseCard = async () => {
     if (!summary || !revisionText || !image) return;
-  
-    await postToZapier({
-      summary,
-      revision: revisionText,
-      image,
-    });
-  
+    await postToZapier({ summary, revision: revisionText, image });
     setRevisionMode(false);
     setRevisionText('');
     setImage(null);
+    setImageRequested(true);
   };
-  
 
   useEffect(() => {
     const interval = setInterval(async () => {
+      if (!imageRequested) return;
       const res = await fetch('/api/receive-image');
       const data = await res.json();
       if (data.url && data.url !== image) {
@@ -85,7 +82,7 @@ export default function Page() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [image]);
+  }, [image, imageRequested]);
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-4">
