@@ -85,66 +85,85 @@ export default function Page() {
   }, [image, imageRequested]);
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-4">
-      <div className="border rounded p-4 h-[500px] overflow-y-scroll bg-gray-50 mb-4">
-        {messages.map((m, i) => (
-          <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block px-3 py-2 rounded-lg ${m.role === 'user' ? 'bg-blue-200' : 'bg-green-200'}`}>
-              {m.content}
-            </span>
-          </div>
-        ))}
-        {loading && <div className="text-left text-gray-400">Typing...</div>}
-        {image && (
-          <div className="text-center mt-4">
-            <img src={image} alt="Generated greeting card" className="max-w-full mx-auto rounded shadow mb-4" />
-            {!revisionMode && (
-              <button
-                onClick={() => setRevisionMode(true)}
-                className="bg-yellow-500 text-white px-4 py-2 rounded"
-              >
-                ✏️ Revise This Image
-              </button>
-            )}
-            {revisionMode && (
-              <div className="mt-4">
-                <textarea
-                  value={revisionText}
-                  onChange={(e) => setRevisionText(e.target.value)}
-                  placeholder="Describe what you'd like to change"
-                  className="w-full border p-2 mb-2 rounded"
-                />
-                <button
-                  onClick={handleReviseCard}
-                  className="bg-purple-600 text-white px-4 py-2 rounded"
-                >
-                  🔁 Submit Revision
-                </button>
+    <div className="min-h-screen flex flex-col bg-pink-50 font-sans">
+      <header className="bg-white shadow p-4 text-center text-xl font-bold text-pink-600">
+        💌 PaperHugs Chat
+      </header>
+
+      <main className="flex-1 max-w-2xl w-full mx-auto p-4">
+        <div className="flex flex-col space-y-3 overflow-y-auto max-h-[70vh] bg-white p-4 rounded-lg shadow-inner">
+          {messages.map((m, i) => (
+            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`px-4 py-2 rounded-2xl max-w-xs text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-pink-100 text-right' : 'bg-pink-200 text-left'}`}>
+                {m.content}
               </div>
-            )}
-          </div>
-        )}
-        {latestAction === 'ready_to_generate' && summary && !image && (
-          <div className="text-center mt-4">
-            <button
-              onClick={handleGenerateCard}
-              className="bg-purple-600 text-white px-6 py-3 rounded shadow"
-            >
-              🎨 Generate Card
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-          className="flex-1 border p-2 rounded"
-          placeholder="Type your message..."
-        />
-        <button onClick={sendMessage} className="bg-blue-600 text-white px-4 py-2 rounded">Send</button>
-      </div>
+            </div>
+          ))}
+
+          {loading && <div className="text-gray-400">✍️ Thinking...</div>}
+
+          {image && (
+            <div className="text-center mt-4">
+              <img src={image} alt="Generated greeting card" className="rounded-xl shadow max-w-full mx-auto" />
+              {!revisionMode && (
+                <button
+                  onClick={() => setRevisionMode(true)}
+                  className="mt-2 bg-yellow-500 text-white px-4 py-2 rounded shadow"
+                >
+                  ✏️ Revise This Image
+                </button>
+              )}
+              {revisionMode && (
+                <div className="mt-4">
+                  <textarea
+                    value={revisionText}
+                    onChange={(e) => setRevisionText(e.target.value)}
+                    placeholder="Describe what you'd like to change"
+                    className="w-full border p-2 mb-2 rounded"
+                  />
+                  <button
+                    onClick={handleReviseCard}
+                    className="bg-purple-600 text-white px-4 py-2 rounded"
+                  >
+                    🔁 Submit Revision
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {latestAction === 'ready_to_generate' && summary && !image && (
+            <div className="text-center mt-4">
+              <button
+                onClick={handleGenerateCard}
+                className="bg-purple-600 text-white px-6 py-3 rounded shadow"
+              >
+                🎨 Generate Card
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 flex gap-2 items-center">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            className="flex-1 border border-pink-300 p-3 rounded-full shadow-sm"
+            placeholder="Type your message..."
+          />
+          <button
+            onClick={sendMessage}
+            className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full shadow"
+          >
+            Send
+          </button>
+        </div>
+      </main>
+
+      <footer className="text-center text-xs text-pink-400 py-4">
+        &copy; {new Date().getFullYear()} PaperHugs.ai — crafted with ❤️
+      </footer>
     </div>
   );
 }
